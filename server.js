@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const localtunnel = require('localtunnel'); // Importing the localtunnel module
 
 const app = express();
 app.use(bodyParser.json());
@@ -10,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Function to run the Python app
 function runPythonApp() {
-    const pythonProcess = spawn('python', ['C:\\Users\\sammy\\Downloads\\Update Game\\lounaoS\\chat-app\\index.py']);
+    const pythonProcess = spawn('python', ['/workspaces/SoSuMi-/index.py']);
 
     pythonProcess.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);
@@ -107,6 +108,14 @@ app.post('/register', (req, res) => {
 // Call the function to run the Python app
 runPythonApp();
 
-app.listen(3000, () => {
+// Start localtunnel to expose the server to the public
+localtunnel({ port: 3000 }).then(url => {
+    console.log(`Public URL: ${url}`);
+}).catch(err => {
+    console.error('Error starting localtunnel:', err);
+});
+
+const server = app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
+    console.log(`Server ID: ${server.address().port}`); // Display server ID in console
 });
